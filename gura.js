@@ -13,7 +13,7 @@ const prefix = "a.";
 const interactionCooldown = 50;
 var   lastInteraction = 0;
 
-var notifChannel = null;
+var notifChannel = [];
 
 const client = new Discord.Client();
 client.on("message", function(message) {
@@ -99,8 +99,15 @@ client.on("message", function(message) {
 		
 		case "setchannel":
 			case "sc":
-				notifChannel = message.channel;
-				message.reply("Okay, this channel will start receiving notifications");
+				if(!notifChannel.includes(message.channel)){
+					notifChannel.push(message.channel)
+					message.reply("Okay, this channel will start receiving notifications");
+				} else {
+					var index = notifChannel.indexOf(message.channel);
+					notifChannel.splice(index, 1);
+					message.reply("Okay, this channel will stop receiving notifications");
+				}
+				
 				break;
 		
 		case "nextlive":
@@ -121,11 +128,14 @@ client.on("message", function(message) {
 });
 
 function autoNotif() {
-	if(notifChannel != null){
+	var log = "";
+	notifChannel.forEach(function(channel) {
 		_youtube.getDateUpcomingLive(true).then(response=>{
-			notifChannel.send(response);
-		}).catch(error=>{ console.log(error); });
-	}
+			channel.send(response);
+			log = response;
+		}).catch(error=>{ log = error; });
+	});
+	console.log(log);
 }
 
 setInterval(autoNotif, 10*60*1000);
