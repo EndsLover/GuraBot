@@ -40,8 +40,8 @@ exports.gura = async function(message, arg, command){
 		switch(arg){
 			case "a": 				dispatcher = connection.play(`./sfx/a.mp3`); break;
 			case "lewdshark": 		dispatcher = connection.play(`./sfx/lewdshark.mp3`); break;
-			case "lewdshark": 		dispatcher = connection.play(`./sfx/lewdshark.mp3`); break;
 			case "loveprofessing": 	dispatcher = connection.play(`./sfx/loveprofessing.mp3`); break;
+			case "morning": 		dispatcher = connection.play(`./sfx/morning.mp3`); break;
 			case "areyouwinning": 	dispatcher = connection.play(`./sfx/ruwinning.mp3`); break;
 			case "sadshark": 		dispatcher = connection.play(`./sfx/sadshark.mp3`); break;
 			case "shrimp": 			dispatcher = connection.play(`./sfx/shrimp.mp3`); break;
