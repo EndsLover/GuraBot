@@ -112,7 +112,7 @@ client.on("message", function(message) {
 		
 		case "nextlive":
 			case "nl":
-				_youtube.getDateUpcomingLive(false).then(response=>{
+				_youtube.getDateUpcomingLive(false, message.channel).then(response=>{
 					message.reply(response);
 				}).catch(error=>{ 
 					if(error == "No upcoming lives detected.")
@@ -130,7 +130,7 @@ client.on("message", function(message) {
 function autoNotif() {
 	var log = "";
 	notifChannel.forEach(function(channel) {
-		_youtube.getDateUpcomingLive(true).then(response=>{
+		_youtube.getDateUpcomingLive(true, channel).then(response=>{
 			channel.send(response);
 			log = response;
 		}).catch(error=>{ log = error; });

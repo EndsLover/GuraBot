@@ -9,7 +9,7 @@ var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
 var TOKEN_PATH = TOKEN_DIR + 'youtube-nodejs-quickstart.json';
 
 var credentials;
-var last_live;
+var last_live = [];
 
 fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   if (err) {
@@ -145,7 +145,7 @@ function formatDateDiff(date1, date2){
 	return (hh + ":" + mm + ":" + ss);
 }
 
-exports.getDateUpcomingLive = function(isAuto) {
+exports.getDateUpcomingLive = function(isAuto, channel) {
 	return new Promise((resolve, reject) => {	
 		try {
 			getAuth(credentials).then(auth=>{
@@ -154,13 +154,13 @@ exports.getDateUpcomingLive = function(isAuto) {
 					var date  		= new Date(live['liveStreamingDetails']['scheduledStartTime']);
 					var last_notif	= new Date();
 					
-					if(last_live != undefined){
-						last_notif 	= last_live['liveStreamingDetails']['scheduledStartTime'];
+					if(last_live[channel] != undefined){
+						last_notif 	= last_live[channel]['liveStreamingDetails']['scheduledStartTime'];
 					}
 					
-					if(last_notif > 1*60*60*1000 || date < 10*60*1000 || !isAuto){
-						last_live = live;
-						resolve("In "+formatDateDiff(new Date(), date)+" will start a new live! "+title);
+					if((last_notif - new Date()) > 1*60*60*1000 || (date - new Date()) < 10*60*1000 || !isAuto){
+						last_live[channel] = live;
+						resolve("In "+formatDateDiff(new Date(), date)+" will start a new live! **"+title+"**");
 					} else {
 						reject('Too soon for another notification!');
 					}
