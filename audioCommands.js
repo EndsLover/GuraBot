@@ -14,7 +14,7 @@ const sfx = [
 	];
 	
 const music = [
-	"A_Cruel_Angel_Thesis.mp3",
+	"A_Cruel_Angels_Thesis.mp3",
 	"Baka_Mitai.mp3",
 	"Bloody_Stream.mp3",
 	"Chiisana_Boukensha.mp3",
@@ -123,6 +123,7 @@ exports.sing = async function(message, arg, command){
 		
 		const connection = await voice_channel.join();
 		var dispatcher;
+		
 		switch(arg){
 			case "01": 	dispatcher = connection.play(`./music/${music[0]}`); break;
 			case "02": 	dispatcher = connection.play(`./music/${music[1]}`); break;
@@ -143,9 +144,11 @@ exports.sing = async function(message, arg, command){
 			default: 	message.reply("I don't know this one");
 		}
 		
-		dispatcher.on('finish', () => {
-			dispatcher.destroy();
-			voice_channel.leave();
-		});
+		if(dispatcher != null && dispatcher != undefined){
+			dispatcher.on('finish', () => {
+				dispatcher.destroy();
+				voice_channel.leave();
+			});
+		}
     }
 }
