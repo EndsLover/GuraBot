@@ -58,6 +58,11 @@ client.on("message", function(message) {
 				_audio.gura(message, args[0], prefix+command); 
 				break;
 				
+		case "gurasing": 
+			case "gs": 	
+				_audio.sing(message, args[0], prefix+command); 
+				break;
+				
 		case "gurafacts":	
 			case "gf":
 				var strText=_text.facts();
@@ -107,7 +112,7 @@ client.on("message", function(message) {
 					notifChannel.splice(index, 1);
 					message.reply("Okay, this channel will stop receiving notifications");
 				}
-				
+				saveNotif();
 				break;
 		
 		case "nextlive":
@@ -138,5 +143,27 @@ function autoNotif() {
 	console.log(log);
 }
 
+function saveNotif(){	
+	let data = JSON.stringify(notifChannel, null, 2);
+
+	fs.writeFile('notifChannel.json', data, (err) => {
+		if (err) throw err;
+	});
+}
+
+function initializeNotif(){
+	fs.readFile('notifChannel.json', (err, json) => {
+		if (err) throw err;
+		fileData = JSON.parse(json);
+		
+		fileData.forEach(function(data) {
+			client.channels.fetch(data["id"])
+				.then(channel => notifChannel.push(channel))
+				.catch(console.error);
+		});
+	});
+}
+
 setInterval(autoNotif, 10*60*1000);
+initializeNotif();
 client.login(auth.token);

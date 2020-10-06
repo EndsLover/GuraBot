@@ -11,6 +11,7 @@ exports.help = function(prefix){
 		.addField(	`Commands`, `
 					${prefix}GuraText 	(${prefix}gt): Reply you with an iconic Gura quote;
 					${prefix}GuraAudio 	(${prefix}ga): Gura joins the vc, she has something to say;
+					${prefix}GuraSing 	(${prefix}gs): Gura likes to sing, it's Karaoke Shark time!;
 					${prefix}GuraFacts	(${prefix}gf): Are you ready for some random ocean facts?;
 					${prefix}GuraClip	(${prefix}gc): Have fun with one of Gura's best moments;
 					${prefix}GuraPics	(${prefix}gp): Cute pics of best shork;

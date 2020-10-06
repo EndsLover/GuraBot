@@ -7,7 +7,8 @@ const quotes = [
 	"Do you taste as good as you look?",
 	"SHORK BRAIN",
 	"Activating shark strategy",
-	"APEX PREDATOR"
+	"APEX PREDATOR",
+	"SHARKOUR"
 	];
 
 const facts = [
@@ -48,7 +49,8 @@ const clips = [
 	"https://www.youtube.com/watch?v=pqTSvylD550",
 	"https://www.youtube.com/watch?v=5U6huL4tV0Y",
 	"https://www.youtube.com/watch?v=Re0PLIAVKP4",
-	"https://www.youtube.com/watch?v=7KyMzX4KqEs"
+	"https://www.youtube.com/watch?v=7KyMzX4KqEs",
+	"https://www.youtube.com/watch?v=g25mkl7Y7A8"
 ];
 
 exports.gura = function(){

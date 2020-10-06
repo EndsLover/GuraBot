@@ -152,17 +152,22 @@ exports.getDateUpcomingLive = function(isAuto, channel) {
 				getUpcomingLive(auth).then(live=>{
 					var title 		= live['snippet']['title'];
 					var date  		= new Date(live['liveStreamingDetails']['scheduledStartTime']);
-					var last_notif	= new Date();
+					var now			= new Date();
+					var last_notif	= now;
 					
 					if(last_live[channel] != undefined){
 						last_notif 	= last_live[channel]['liveStreamingDetails']['scheduledStartTime'];
 					}
 					
-					if((last_notif - new Date()) > 1*60*60*1000 || (date - new Date()) < 10*60*1000 || !isAuto){
-						last_live[channel] = live;
-						resolve("In "+formatDateDiff(new Date(), date)+" will start a new live! **"+title+"**");
+					if((date - now) >= 0){
+						if(last_notif == now || (last_notif - now) > 1*60*60*1000 || (date - now) < 10*60*1000 || !isAuto){
+							last_live[channel] = live;
+							resolve("In "+formatDateDiff(new Date(), date)+" will start a new live! **"+title+"**. https://www.youtube.com/watch?v="+live[id]);
+						} else {
+							reject('Too soon for another notification!');
+						}
 					} else {
-						reject('Too soon for another notification!');
+						resolve('No upcoming live detected!');
 					}
 				}).catch(e=> { reject(e); });
 			}).catch(e=> { reject(e); });
