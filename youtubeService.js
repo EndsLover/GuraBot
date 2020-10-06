@@ -107,7 +107,7 @@ function getUpcomingCollab(auth){
 						console.log('The API returned an error: ' + err);
 						reject(err);
 					}
-					if (response.data.items.length == 0){
+					if (response == undefined || response.data.items.length == 0){
 						return;
 					}
 

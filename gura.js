@@ -120,10 +120,11 @@ client.on("message", function(message) {
 				_youtube.getDateUpcomingLive(false, message.channel).then(response=>{
 					message.reply(response);
 				}).catch(error=>{ 
-					if(error == "No upcoming lives detected.")
+					if(error == "No upcoming lives detected.") {
 						message.reply(error);
-					else
+					} else {
 						console.log(error);
+					}
 				});
 				break;
 		
