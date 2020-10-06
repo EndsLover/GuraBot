@@ -11,6 +11,13 @@ var TOKEN_PATH = TOKEN_DIR + 'youtube-nodejs-quickstart.json';
 var credentials;
 var last_live = [];
 
+const collabChannels = [
+	"UCyl1z3jo3XHR1riLFKG5UAg", //Watson Amelia
+	"UCMwGHR0BTZuLsmjY_NT5Pwg", //Ninomae Ina'nis
+	"UCL_qhgtOy0dy1Agp8vkySQg", //Mori Calliope
+	"UCHsx4Hqa-1ORjQTh9TYDhww"  //Takanashi Kiara
+	];
+
 fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   if (err) {
     console.log('Error loading client secret file: ' + err);
@@ -82,6 +89,63 @@ function storeToken(token) {
   });
 }
 
+function getUpcomingCollab(auth){
+	return new Promise((resolve, reject) => {
+		collabChannels.forEach(function(channelId) {
+			try {
+				var service = google.youtube('v3');
+				service.search.list({
+					auth: auth,
+					part: 'id',
+					channelId: channelId,
+					eventType: "upcoming",
+					type: "video",
+					maxResults: 1,
+					order: "date"
+				}, function(err, response) {
+					if (err) {
+						console.log('The API returned an error: ' + err);
+						reject(err);
+					}
+					if (response.data.items.length == 0){
+						return;
+					}
+
+					var nextLive = response.data.items[0];
+					if(nextLive == undefined){
+						return;
+					} else {
+						service.videos.list({
+							auth: auth,
+							part: 'id,liveStreamingDetails,snippet',
+							id: nextLive['id']['videoId']
+						}, function(err2, liveDetails) {
+							if (err2) {
+								console.log('The API returned an error: ' + err2);
+								reject(err2);
+							}
+							var live = liveDetails.data.items[0];
+							
+							var title 		= live['snippet']['title'].toLowerCase();
+							var description = live['snippet']['description'].toLowerCase();
+							var date = new Date(live['liveStreamingDetails']['scheduledStartTime']);
+							var now	= new Date();
+							
+							if(date - now >= 0){
+								if(title.search("gura") >= 0 || description.search("gura") >= 0) {
+									resolve(live);
+								}
+							}
+						});
+					}
+				})
+			} catch (e) {
+				reject(e.message);
+			}
+		});
+	});
+}
+
 function getUpcomingLive(auth){
 	return new Promise((resolve, reject) => {
 		try {
@@ -109,7 +173,7 @@ function getUpcomingLive(auth){
 				} else {
 					service.videos.list({
 						auth: auth,
-						part: 'liveStreamingDetails,snippet',
+						part: 'id,liveStreamingDetails,snippet',
 						id: nextLive['id']['videoId']
 					}, function(err2, liveDetails) {
 						if (err2) {
@@ -117,7 +181,15 @@ function getUpcomingLive(auth){
 							reject(err2);
 						}
 						var live = liveDetails.data.items[0];
-						resolve(live);
+						
+						var date = new Date(live['liveStreamingDetails']['scheduledStartTime']);
+						var now	= new Date();
+						
+						if(date - now >= 0){
+							resolve(live);
+						} else {
+							reject("No upcoming lives detected.");
+						}
 					});
 				}
 			})
@@ -162,14 +234,36 @@ exports.getDateUpcomingLive = function(isAuto, channel) {
 					if((date - now) >= 0){
 						if(last_notif == now || (last_notif - now) > 1*60*60*1000 || (date - now) < 10*60*1000 || !isAuto){
 							last_live[channel] = live;
-							resolve("In "+formatDateDiff(new Date(), date)+" will start a new live! **"+title+"**. https://www.youtube.com/watch?v="+live[id]);
+							resolve("In "+formatDateDiff(new Date(), date)+" will start a new live! **"+title+"**. https://www.youtube.com/watch?v="+live["id"]);
 						} else {
 							reject('Too soon for another notification!');
 						}
 					} else {
-						resolve('No upcoming live detected!');
+						reject('No upcoming lives detected!');
 					}
-				}).catch(e=> { reject(e); });
+				}).catch(e=> { 
+					getUpcomingCollab(auth).then(live=>{
+						var title 		= live['snippet']['title'];
+						var date  		= new Date(live['liveStreamingDetails']['scheduledStartTime']);
+						var now			= new Date();
+						var last_notif	= now;
+						
+						if(last_live[channel] != undefined){
+							last_notif 	= last_live[channel]['liveStreamingDetails']['scheduledStartTime'];
+						}
+						
+						if((date - now) >= 0){
+							if(last_notif == now || (last_notif - now) > 1*60*60*1000 || (date - now) < 10*60*1000 || !isAuto){
+								last_live[channel] = live;
+								resolve("In "+formatDateDiff(new Date(), date)+" will start a new live! **"+title+"**. https://www.youtube.com/watch?v="+live["id"]);
+							} else {
+								reject('Too soon for another notification!');
+							}
+						} else {
+							reject('No upcoming lives detected!');
+						}
+					}).catch(e=> { reject(e); });
+				});
 			}).catch(e=> { reject(e); });
 		} catch (e) {
 			reject(e.message);

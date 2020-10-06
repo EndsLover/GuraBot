@@ -157,6 +157,7 @@ function initializeNotif(){
 		fileData = JSON.parse(json);
 		
 		fileData.forEach(function(data) {
+			if(data == null) return;
 			client.channels.fetch(data["id"])
 				.then(channel => notifChannel.push(channel))
 				.catch(console.error);
