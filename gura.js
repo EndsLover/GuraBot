@@ -164,6 +164,6 @@ function initializeNotif(){
 	});
 }
 
-setInterval(autoNotif, 10*60*1000);
+setInterval(autoNotif, 1*60*60*1000);
 initializeNotif();
 client.login(auth.token);
