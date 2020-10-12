@@ -1,26 +1,3 @@
 [
-  null,
-  {
-    "type": "text",
-    "deleted": false,
-    "id": "760702417099685969",
-    "name": "gura-bot",
-    "rawPosition": 7,
-    "parentID": null,
-    "permissionOverwrites": [],
-    "topic": null,
-    "nsfw": false,
-    "lastMessageID": "763015265776566273",
-    "rateLimitPerUser": 0,
-    "lastPinTimestamp": null,
-    "guild": "273125574241812482",
-    "messages": [
-      "763015068803006475",
-      "763015179998461962",
-      "763015196079685673",
-      "763015251104497666",
-      "763015265776566273"
-    ],
-    "createdTimestamp": 1601435989404
-  }
+  null
 ]

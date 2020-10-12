@@ -50,7 +50,12 @@ const clips = [
 	"https://www.youtube.com/watch?v=5U6huL4tV0Y",
 	"https://www.youtube.com/watch?v=Re0PLIAVKP4",
 	"https://www.youtube.com/watch?v=7KyMzX4KqEs",
-	"https://www.youtube.com/watch?v=g25mkl7Y7A8"
+	"https://www.youtube.com/watch?v=g25mkl7Y7A8",
+	"https://www.youtube.com/watch?v=tHGBhz_D4M0",
+	"https://www.youtube.com/watch?v=XgXrpyChHSw",
+	"https://www.youtube.com/watch?v=lYQFAL59PQA",
+	"https://www.youtube.com/watch?v=WIwk-B-LfHI",
+	"https://www.youtube.com/watch?v=mhhJ7v6qYn4"
 ];
 
 exports.gura = function(){

@@ -9,7 +9,8 @@ var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
 var TOKEN_PATH = TOKEN_DIR + 'youtube-nodejs-quickstart.json';
 
 var credentials;
-var last_live = [];
+var next_live = null;
+var last_notification;
 
 const collabChannels = [
 	"UCyl1z3jo3XHR1riLFKG5UAg", //Watson Amelia
@@ -91,56 +92,60 @@ function storeToken(token) {
 
 function getUpcomingCollab(auth){
 	return new Promise((resolve, reject) => {
+		let foundCollab = false;
 		collabChannels.forEach(function(channelId) {
-			try {
-				var service = google.youtube('v3');
-				service.search.list({
-					auth: auth,
-					part: 'id',
-					channelId: channelId,
-					eventType: "upcoming",
-					type: "video",
-					maxResults: 1,
-					order: "date"
-				}, function(err, response) {
-					if (err) {
-						console.log('The API returned an error: ' + err);
-						reject(err);
-					}
-					if (response == undefined || response.data.items.length == 0){
-						return;
-					}
+			if(!foundCollab){
+				try {
+					var service = google.youtube('v3');
+					service.search.list({
+						auth: auth,
+						part: 'id',
+						channelId: channelId,
+						eventType: "upcoming",
+						type: "video",
+						maxResults: 1,
+						order: "date"
+					}, function(err, response) {
+						if (err) {
+							console.log('The API returned an error: ' + err);
+							reject(err);
+						}
+						if (response == undefined || response.data.items.length == 0){
+							return;
+						}
 
-					var nextLive = response.data.items[0];
-					if(nextLive == undefined){
-						return;
-					} else {
-						service.videos.list({
-							auth: auth,
-							part: 'id,liveStreamingDetails,snippet',
-							id: nextLive['id']['videoId']
-						}, function(err2, liveDetails) {
-							if (err2) {
-								console.log('The API returned an error: ' + err2);
-								reject(err2);
-							}
-							var live = liveDetails.data.items[0];
-							
-							var title 		= live['snippet']['title'].toLowerCase();
-							var description = live['snippet']['description'].toLowerCase();
-							var date = new Date(live['liveStreamingDetails']['scheduledStartTime']);
-							var now	= new Date();
-							
-							if(date - now >= 0){
-								if(title.search("gura") >= 0 || description.search("gura") >= 0) {
-									resolve(live);
+						var nextLive = response.data.items[0];
+						if(nextLive == undefined){
+							return;
+						} else {
+							service.videos.list({
+								auth: auth,
+								part: 'id,liveStreamingDetails,snippet',
+								id: nextLive['id']['videoId']
+							}, function(err2, liveDetails) {
+								if (err2) {
+									console.log('The API returned an error: ' + err2);
+									reject(err2);
 								}
-							}
-						});
-					}
-				})
-			} catch (e) {
-				reject(e.message);
+								var live = liveDetails.data.items[0];
+								
+								var title 		= live['snippet']['title'].toLowerCase();
+								var description = live['snippet']['description'].toLowerCase();
+								var date = new Date(live['liveStreamingDetails']['scheduledStartTime']);
+								var now	= new Date();
+								
+								if(date - now >= 0){
+									if(title.search("collab") >= 0 &&(title.search("gura") >= 0 || description.search("gura") >= 0)) {
+										foundCollab = true;
+										resolve(live);
+									}
+								}
+							});
+						}
+					})
+				} catch (e) {
+					reject(e.message);
+				}
 			}
 		});
 	});
@@ -164,12 +169,12 @@ function getUpcomingLive(auth){
 					reject(err);
 				}
 				if (response.data.items.length == 0){
-					reject("No upcoming lives detected.");
+					reject("No upcoming lives detected!");
 				}
 
 				var nextLive = response.data.items[0];
 				if(nextLive == undefined){
-					reject("No upcoming lives detected.");
+					reject("No upcoming lives detected!");
 				} else {
 					service.videos.list({
 						auth: auth,
@@ -188,7 +193,7 @@ function getUpcomingLive(auth){
 						if(date - now >= 0){
 							resolve(live);
 						} else {
-							reject("No upcoming lives detected.");
+							reject("No upcoming lives detected!");
 						}
 					});
 				}
@@ -217,54 +222,41 @@ function formatDateDiff(date1, date2){
 	return (hh + ":" + mm + ":" + ss);
 }
 
-exports.getDateUpcomingLive = function(isAuto, channel) {
+exports.notifyNextLive = function(isAuto) {
 	return new Promise((resolve, reject) => {	
 		try {
-			getAuth(credentials).then(auth=>{
-				getUpcomingLive(auth).then(live=>{
-					var title 		= live['snippet']['title'];
-					var date  		= new Date(live['liveStreamingDetails']['scheduledStartTime']);
-					var now			= new Date();
-					var last_notif	= now;
-					
-					if(last_live[channel] != undefined){
-						last_notif 	= last_live[channel]['liveStreamingDetails']['scheduledStartTime'];
-					}
-					
-					if((date - now) >= 0){
-						if(last_notif == now || (last_notif - now) > 1*60*60*1000 || (date - now) < 10*60*1000 || !isAuto){
-							last_live[channel] = live;
-							resolve("In "+formatDateDiff(new Date(), date)+" will start a new live! **"+title+"**. https://www.youtube.com/watch?v="+live["id"]);
-						} else {
-							reject('Too soon for another notification!');
-						}
+			let now	= new Date();
+			
+			if(next_live == null){
+				getAuth(credentials).then(auth=>{
+					getUpcomingLive(auth).then(live=>{
+						next_live = live;
+					}).catch(e=> { 
+						getUpcomingCollab(auth).then(live=>{
+							next_live = live;
+						}).catch(e=> { reject(e); });
+					});
+				}).catch(e=> { reject(e); });
+			}
+			
+			if(next_live != null){
+				let live_date 	= next_live['liveStreamingDetails']['scheduledStartTime'];
+				let title 		= next_live['snippet']['title'];
+				
+				if((live_date - now) >= 0){
+					if(last_notification == undefined || (last_notification - now) > 1*60*60*1000 || (live_date - now) || !isAuto){
+						last_notification = new Date();
+						resolve("In "+formatDateDiff(new Date(), date)+" will start a new live! **"+title+"**. https://www.youtube.com/watch?v="+live["id"]);
 					} else {
-						reject('No upcoming lives detected!');
+						reject('Too soon for another notification!');
 					}
-				}).catch(e=> { 
-					getUpcomingCollab(auth).then(live=>{
-						var title 		= live['snippet']['title'];
-						var date  		= new Date(live['liveStreamingDetails']['scheduledStartTime']);
-						var now			= new Date();
-						var last_notif	= now;
-						
-						if(last_live[channel] != undefined){
-							last_notif 	= last_live[channel]['liveStreamingDetails']['scheduledStartTime'];
-						}
-						
-						if((date - now) >= 0){
-							if(last_notif == now || (last_notif - now) > 1*60*60*1000 || (date - now) < 10*60*1000 || !isAuto){
-								last_live[channel] = live;
-								resolve("In "+formatDateDiff(new Date(), date)+" will start a new live! **"+title+"**. https://www.youtube.com/watch?v="+live["id"]);
-							} else {
-								reject('Too soon for another notification!');
-							}
-						} else {
-							reject('No upcoming lives detected!');
-						}
-					}).catch(e=> { reject(e); });
-				});
-			}).catch(e=> { reject(e); });
+				} else {
+					next_live = null;
+					resolve("Gura is now live! **"+title+"**. https://www.youtube.com/watch?v="+live["id"]);
+				}
+			} else {
+				reject('No upcoming lives detected!');
+			}		
 		} catch (e) {
 			reject(e.message);
 		}
