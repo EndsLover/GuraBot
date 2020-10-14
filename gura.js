@@ -128,10 +128,9 @@ client.on("message", function(message) {
 				});
 				break;
 				
-		case "bruh":	
-			case "gb":
-				message.reply("bruh");
-				break;
+		case "bruh":
+			message.reply("bruh");
+			break;
 		
 		default: message.channel.send(_text.gura());
 	}
