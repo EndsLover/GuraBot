@@ -127,6 +127,11 @@ client.on("message", function(message) {
 					}
 				});
 				break;
+				
+		case "bruh":	
+			case "gb":
+				message.reply("bruh");
+				break;
 		
 		default: message.channel.send(_text.gura());
 	}

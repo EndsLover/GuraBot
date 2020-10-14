@@ -109,6 +109,7 @@ function getUpcomingCollab(auth){
 						if (err) {
 							console.log('The API returned an error: ' + err);
 							reject(err);
+							return;
 						}
 						if (response == undefined || response.data.items.length == 0){
 							return;
@@ -167,9 +168,11 @@ function getUpcomingLive(auth){
 				if (err) {
 					console.log('The API returned an error: ' + err);
 					reject(err);
+					return;
 				}
 				if (response.data.items.length == 0){
 					reject("No upcoming lives detected!");
+					return;
 				}
 
 				var nextLive = response.data.items[0];
