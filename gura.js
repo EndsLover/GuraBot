@@ -63,6 +63,11 @@ client.on("message", function(message) {
 				_audio.sing(message, args[0], prefix+command); 
 				break;
 				
+		case "senzawasing": 
+			case "ss": 	
+				_audio.senzawasing(message, args[0], prefix+command); 
+				break;
+				
 		case "gurafacts":	
 			case "gf":
 				var strText=_text.facts();

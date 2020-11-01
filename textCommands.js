@@ -8,7 +8,12 @@ const quotes = [
 	"SHORK BRAIN",
 	"Activating shark strategy",
 	"APEX PREDATOR",
-	"SHARKOUR"
+	"SHARKOUR",
+	"Do you want my seed?",
+	"Think deliciously E V I L",
+	"Hey look, it's Watson's tennis racket!",
+	"Popcorn is a vegetable",
+	"...and that is how babies are made!"
 	];
 
 const facts = [
@@ -36,7 +41,8 @@ const facts = [
 	"There are more historic artefacts under the sea than in all of the world’s museums.",
 	"The world’s longest mountain chain is underwater.",
 	"Less than five per cent of the planet’s oceans have been explored.",
-	"Our oceans cover more than 70 per cent of the Earth’s surface."
+	"Our oceans cover more than 70 per cent of the Earth’s surface.",
+	"Sharks have two penis-like organs called claspers."
 	];
 
 const clips = [
@@ -55,7 +61,10 @@ const clips = [
 	"https://www.youtube.com/watch?v=XgXrpyChHSw",
 	"https://www.youtube.com/watch?v=lYQFAL59PQA",
 	"https://www.youtube.com/watch?v=WIwk-B-LfHI",
-	"https://www.youtube.com/watch?v=mhhJ7v6qYn4"
+	"https://www.youtube.com/watch?v=mhhJ7v6qYn4",
+	"https://www.youtube.com/watch?v=iUTHdwxRFVU",
+	"https://www.youtube.com/watch?v=9yDv2xxYeko",
+	"https://www.youtube.com/watch?v=4tXljjRHrNg"
 ];
 
 exports.gura = function(){
