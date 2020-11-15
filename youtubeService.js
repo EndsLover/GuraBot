@@ -176,6 +176,7 @@ function getUpcomingLive(auth){
 				}
 
 				var nextLive = response.data.items[0];
+				
 				if(nextLive == undefined){
 					reject("No upcoming lives detected!");
 				} else {
@@ -225,6 +226,25 @@ function formatDateDiff(date1, date2){
 	return (hh + ":" + mm + ":" + ss);
 }
 
+function buildNotif(live){
+	let live_date 	= new Date(live['liveStreamingDetails']['scheduledStartTime']);
+	let title 		= live['snippet']['title'];
+	let now			= new Date();
+	
+	if((live_date - now) >= 0){
+		next_live = live;
+		if(last_notification == undefined || (last_notification - now) > 2*60*60*1000 || (live_date - now) || !isAuto){
+			last_notification = new Date();
+			return "In "+formatDateDiff(new Date(), date)+" will start a new live! **"+title+"**. https://www.youtube.com/watch?v="+live["id"];
+		} else {
+			return 'Too soon for another notification!';
+		}
+	} else {
+		next_live = null;
+		return "Gura is now live! **"+title+"**. https://www.youtube.com/watch?v="+live["id"];
+	}
+}
+
 exports.notifyNextLive = function(isAuto) {
 	return new Promise((resolve, reject) => {	
 		try {
@@ -233,33 +253,34 @@ exports.notifyNextLive = function(isAuto) {
 			if(next_live == null){
 				getAuth(credentials).then(auth=>{
 					getUpcomingLive(auth).then(live=>{
-						next_live = live;
+						var notif = buildNotif(live);
+						
+						if(notif == "Too soon for another notification!"){
+							reject("Too soon for another notification!");
+						} else {
+							resolve(notif);
+						}
 					}).catch(e=> { 
 						getUpcomingCollab(auth).then(live=>{
-							next_live = live;
-						}).catch(e=> { reject(e); });
+							var notif = buildNotif(live);
+				
+							if(notif == "Too soon for another notification!"){
+								reject("Too soon for another notification!");
+							} else {
+								resolve(notif);
+							}
+						}).catch(e=> { reject('No upcoming lives detected!'); });
 					});
 				}).catch(e=> { reject(e); });
-			}
-			
-			if(next_live != null){
-				let live_date 	= next_live['liveStreamingDetails']['scheduledStartTime'];
-				let title 		= next_live['snippet']['title'];
-				
-				if((live_date - now) >= 0){
-					if(last_notification == undefined || (last_notification - now) > 1*60*60*1000 || (live_date - now) || !isAuto){
-						last_notification = new Date();
-						resolve("In "+formatDateDiff(new Date(), date)+" will start a new live! **"+title+"**. https://www.youtube.com/watch?v="+live["id"]);
-					} else {
-						reject('Too soon for another notification!');
-					}
-				} else {
-					next_live = null;
-					resolve("Gura is now live! **"+title+"**. https://www.youtube.com/watch?v="+live["id"]);
-				}
 			} else {
-				reject('No upcoming lives detected!');
-			}		
+				var notif = buildNotif(next_live);
+				
+				if(notif == "Too soon for another notification!"){
+					reject("Too soon for another notification!");
+				} else {
+					resolve(notif);
+				}
+			}	
 		} catch (e) {
 			reject(e.message);
 		}

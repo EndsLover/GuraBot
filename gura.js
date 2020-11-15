@@ -105,7 +105,6 @@ client.on("message", function(message) {
 			case "gp": 	
 				message.channel.send({files: [{attachment: _image.gura(), size: 4096}]}); 
 				break;
-		//case "getstream": case "gs":
 		
 		case "setchannel":
 			case "sc":
@@ -173,6 +172,6 @@ function initializeNotif(){
 	});
 }
 
-setInterval(autoNotif, 1*60*60*1000);
+setInterval(autoNotif, 2*60*60*1000);
 initializeNotif();
 client.login(auth.token);

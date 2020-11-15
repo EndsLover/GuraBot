@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const https = require('https');
 
 exports.gura = function(){
-	const pic = `./img/random/${Math.floor(Math.random() * 41)}.jpg`
+	const pic = `./img/random/${Math.floor(Math.random() * 50)}.jpg`
 	
 	return pic;
 }
