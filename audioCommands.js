@@ -44,6 +44,7 @@ const music = [
 	"Odoroyo_Fish.mp3",
 	"Ouchi_ni_Kaeritai.mp3",
 	"Paradise.mp3",
+	"Plastic_Love(Risu_Synced_Version).mp3",
 	"Plastic_Love.mp3",
 	"Promise_of_the_World.mp3",
 	"Renai_Circulation.mp3",
@@ -147,13 +148,13 @@ exports.sing = async function(message, arg, command){
 			var help_msg = new Discord.MessageEmbed()
 				.setColor(`#006994`)
 				.setTitle(`What do you want me to sing?`)
-				.setDescription(`	${command} ${i++} = 24_Hour_Cinderella
+				.setDescription(`	${command} ${i++} = 24 Hour Cinderella
 									${command} ${i++} = A Cruel Angel Thesis
 									${command} ${i++} = A Kiss From The Rose Seal
 									${command} ${i++} = Ai no Uta
 									${command} ${i++} = All Star
 									${command} ${i++} = Baka Mitai
-									${command} ${i++} = Big_Iron
+									${command} ${i++} = Big Iron
 									${command} ${i++} = Bloody Stream
 									${command} ${i++} = Bubbly
 									${command} ${i++} = Can't Help Falling In Love
@@ -177,6 +178,7 @@ exports.sing = async function(message, arg, command){
 									${command} ${i++} = Odoroyo Fish
 									${command} ${i++} = Ouchi ni Kaeritai
 									${command} ${i++} = Paradise
+									${command} ${i++} = Plastic Love (Synced with Risu)
 									${command} ${i++} = Plastic Love
 									${command} ${i++} = Promise of the World
 									${command} ${i++} = Renai Circulation

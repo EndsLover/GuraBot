@@ -168,38 +168,36 @@ function getUpcomingLive(auth){
 				if (err) {
 					console.log('The API returned an error: ' + err);
 					reject(err);
-					return;
-				}
-				if (response.data.items.length == 0){
-					reject("No upcoming lives detected!");
-					return;
-				}
-
-				var nextLive = response.data.items[0];
-				
-				if(nextLive == undefined){
+				} else if (response.data.items.length == 0){
 					reject("No upcoming lives detected!");
 				} else {
-					service.videos.list({
-						auth: auth,
-						part: 'id,liveStreamingDetails,snippet',
-						id: nextLive['id']['videoId']
-					}, function(err2, liveDetails) {
-						if (err2) {
-							console.log('The API returned an error: ' + err2);
-							reject(err2);
-						}
-						var live = liveDetails.data.items[0];
-						
-						var date = new Date(live['liveStreamingDetails']['scheduledStartTime']);
-						var now	= new Date();
-						
-						if(date - now >= 0){
-							resolve(live);
-						} else {
-							reject("No upcoming lives detected!");
-						}
-					});
+					
+					var nextLive = response.data.items[0];
+				
+					if(nextLive == undefined){
+						reject("No upcoming lives detected!");
+					} else {
+						service.videos.list({
+							auth: auth,
+							part: 'id,liveStreamingDetails,snippet',
+							id: nextLive['id']['videoId']
+						}, function(err2, liveDetails) {
+							if (err2) {
+								console.log('The API returned an error: ' + err2);
+								reject(err2);
+							}
+							var live = liveDetails.data.items[0];
+							
+							var date = new Date(live['liveStreamingDetails']['scheduledStartTime']);
+							var now	= new Date();
+							
+							if(date - now >= 0){
+								resolve(live);
+							} else {
+								reject("No upcoming lives detected!");
+							}
+						});
+					}
 				}
 			})
 		} catch (e) {
@@ -234,8 +232,9 @@ function buildNotif(live){
 	if((live_date - now) >= 0){
 		next_live = live;
 		if(last_notification == undefined || (last_notification - now) > 2*60*60*1000 || (live_date - now) || !isAuto){
+			let ret = "In "+formatDateDiff(new Date(), live_date)+" will start a new live! **"+title+"**. https://www.youtube.com/watch?v="+live["id"];
 			last_notification = new Date();
-			return "In "+formatDateDiff(new Date(), date)+" will start a new live! **"+title+"**. https://www.youtube.com/watch?v="+live["id"];
+			return ret;
 		} else {
 			return 'Too soon for another notification!';
 		}
@@ -255,6 +254,7 @@ exports.notifyNextLive = function(isAuto) {
 					getUpcomingLive(auth).then(live=>{
 						var notif = buildNotif(live);
 						
+						console.log(notif);
 						if(notif == "Too soon for another notification!"){
 							reject("Too soon for another notification!");
 						} else {
